@@ -1,0 +1,75 @@
+<% layout('layouts/main') %>
+
+<h2>Fazer Pedido de Material</h2>
+
+<% if (typeof query !== 'undefined' && query.success) { %>
+    <div class="alert alert-success"><%= query.success %></div>
+<% } %>
+<% if (typeof query !== 'undefined' && query.error) { %>
+    <div class="alert alert-danger"><%= query.error %></div>
+<% } %>
+
+
+<form action="/requests" method="POST" class="material-form">
+    <div class="form-group">
+        <label for="teacher_name">Nome do Professor(a):</label>
+        <input type="text" id="teacher_name" name="teacher_name" required>
+    </div>
+
+    <h3>Materiais Disponíveis</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome do Material</th>
+                <th>Descrição</th>
+                <th class="quantity">Disponível</th>
+                <th class="quantity">Quantidade Pedida</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(materials.length > 0) { %>
+                <% materials.forEach(material => { %>
+                    <tr>
+                        <td><%= material.name %></td>
+                        <td><%= material.description %></td>
+                        <td class="quantity"><%= material.quantity %></td>
+                        <td class="quantity">
+                            <input type="number" name="quantity_<%= material.id %>" min="0" max="<%= material.quantity %>" value="0" class="quantity-input">
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4">Nenhum material disponível no momento.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Enviar Pedido</button>
+    </div>
+</form>
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+    .quantity-input {
+        width: 80px;
+        text-align: center;
+    }
+</style>

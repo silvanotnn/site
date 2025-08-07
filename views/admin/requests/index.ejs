@@ -1,0 +1,162 @@
+<% layout('layouts/main') %>
+
+<h2>Gerenciar Pedidos de Materiais</h2>
+
+<% if (locals.query && query.success) { %>
+    <div class="alert alert-success"><%= query.success %></div>
+<% } %>
+<% if (locals.query && query.error) { %>
+    <div class="alert alert-danger"><%= query.error %></div>
+<% } %>
+
+<table>
+    <thead>
+        <tr>
+            <th>Data do Pedido</th>
+            <th>Professor(a)</th>
+            <th>Material</th>
+            <th class="quantity">Qtd. Pedida</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if(requests.length > 0) { %>
+            <% requests.forEach(request => { %>
+                <tr class="status-row-<%= request.status %>">
+                    <td><%= new Date(request.created_at).toLocaleString('pt-BR') %></td>
+                    <td><%= request.teacher_name %></td>
+                    <td><%= request.material_name %></td>
+                    <td class="quantity"><%= request.quantity %></td>
+                    <td><span class="status-badge status-<%= request.status %>"><%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %></span></td>
+                    <td class="actions">
+                        <% if (request.status === 'pending') { %>
+                            <form action="/admin/requests/<%= request.id %>/update-status" method="POST" style="display:inline;">
+                                <input type="hidden" name="new_status" value="approved">
+                                <button type="submit" class="btn btn-success">Aprovar</button>
+                            </form>
+                            <form action="/admin/requests/<%= request.id %>/update-status" method="POST" style="display:inline;">
+                                <input type="hidden" name="new_status" value="rejected">
+                                <button type="submit" class="btn btn-danger">Rejeitar</button>
+                            </form>
+                        <% } else if (request.status === 'approved') { %>
+                             <form action="/admin/requests/<%= request.id %>/update-status" method="POST" style="display:inline;">
+                                <input type="hidden" name="new_status" value="fulfilled">
+                                <button type="submit" class="btn btn-primary">Marcar como Entregue</button>
+                            </form>
+                        <% } else { %>
+                            <span>-</span>
+                        <% } %>
+                    </td>
+                </tr>
+            <% }) %>
+        <% } else { %>
+            <tr>
+                <td colspan="6">Nenhum pedido encontrado.</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<style>
+    .btn-success { background-color: #28a745; }
+    .btn-success:hover { background-color: #218838; }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 15px;
+        color: #fff;
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+    .status-pending { background-color: #ffc107; color: #333 }
+    .status-approved { background-color: #28a745; }
+    .status-rejected { background-color: #dc3545; }
+    .status-fulfilled { background-color: #007bff; }
+
+    .status-row-fulfilled {
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+    .status-row-rejected {
+        background-color: #f8d7da;
+        text-decoration: line-through;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let lastPendingCount = -1;
+
+        function playNotificationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 note
+                oscillator.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.2); // Play for 0.2 seconds
+            } catch (e) {
+                console.error("Could not play sound:", e);
+            }
+        }
+
+        function showNotificationBanner() {
+            let banner = document.getElementById('notification-banner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'notification-banner';
+                banner.innerHTML = `<strong>Novo Pedido Recebido!</strong> Por favor, <a href="/admin/requests" style="color:white; font-weight:bold;">atualize a página</a> para ver.`;
+                banner.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: #28a745;
+                    color: white;
+                    padding: 15px;
+                    border-radius: 5px;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    cursor: pointer;
+                `;
+                banner.onclick = () => { banner.style.display = 'none'; };
+                document.body.appendChild(banner);
+            }
+            banner.style.display = 'block';
+        }
+
+        function checkForNewRequests() {
+            fetch('/api/requests/pending-count')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const pendingCount = data.count;
+
+                    if (lastPendingCount === -1) {
+                        lastPendingCount = pendingCount;
+                        return;
+                    }
+
+                    if (pendingCount > lastPendingCount) {
+                        playNotificationSound();
+                        showNotificationBanner();
+                    }
+
+                    lastPendingCount = pendingCount;
+                })
+                .catch(error => console.error('Error checking for new requests:', error));
+        }
+
+        // Check every 15 seconds
+        setInterval(checkForNewRequests, 15000);
+
+        // Initial check to set the baseline
+        checkForNewRequests();
+    });
+</script>
