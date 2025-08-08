@@ -1,6 +1,13 @@
-# Como Executar a Aplicação
+# Como Executar a Aplicação (Compatível com Windows)
 
-Para colocar a aplicação online e testá-la, você precisará executá-la em um ambiente que tenha o Node.js instalado. Pode ser no seu próprio computador ou em um servidor na nuvem.
+Para colocar a aplicação online e testá-la, você precisará executá-la em um ambiente que tenha o **Node.js** instalado.
+
+## Passo 0: Instalar o Node.js (Se Você Ainda Não Tiver)
+
+*   **Para Windows:** A maneira mais fácil é ir ao site oficial: [https://nodejs.org/](https://nodejs.org/). Baixe a versão **LTS**, que é a mais estável. O instalador é um programa `.msi` normal, basta seguir os passos. Isso também instalará o `npm`, que é o gerenciador de pacotes do Node.js.
+*   **Para Mac/Linux:** Você também pode usar o site oficial ou um gerenciador de pacotes como `nvm` ou `brew`.
+
+Para verificar se a instalação funcionou, abra um novo terminal (no Windows, pode ser o 'Prompt de Comando' ou 'PowerShell') e digite `node --version`. Você deverá ver um número de versão.
 
 ## Passos para Execução Local
 
@@ -10,7 +17,7 @@ Para colocar a aplicação online e testá-la, você precisará executá-la em u
 
 2.  **Instale as Dependências:**
     *   Abra um terminal ou prompt de comando na pasta do projeto.
-    *   Execute o comando: `npm install`. Ele vai instalar todas as ferramentas que a aplicação precisa para funcionar (Express, EJS, etc.).
+    *   Execute o comando: `npm install`. Ele vai instalar todas as ferramentas que a aplicação precisa para funcionar.
 
 3.  **Crie o Banco de Dados:**
     *   Antes de iniciar o servidor pela primeira vez, você precisa criar as tabelas no banco de dados. Para fazer isso, execute o seguinte comando no terminal:
@@ -23,9 +30,4 @@ Para colocar a aplicação online e testá-la, você precisará executá-la em u
 
 5.  **Acesse no Navegador:**
     *   Abra seu navegador de internet (Chrome, Firefox, etc.) e acesse o endereço: `http://localhost:3000`.
-    *   Você verá a página inicial da aplicação e poderá começar a testar!
-
-## Dica para Servidor Online (Avançado)
-
-*   Se você estiver fazendo isso em um servidor online (como DigitalOcean, AWS, etc.), você precisará usar o endereço de IP do servidor em vez de `localhost` e garantir que a porta `3000` esteja liberada no firewall.
-*   Para manter a aplicação rodando 24/7, é recomendado usar uma ferramenta como o `pm2`. Depois de instalar o `pm2` (`npm install pm2 -g`), você pode iniciar a aplicação com `pm2 start index.js` e ele cuidará de mantê-la online.
+    *   Você verá a página inicial da aplicação e poderá começar a testar! O banco de dados será salvo em um diretório temporário do seu sistema operacional.

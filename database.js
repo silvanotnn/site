@@ -1,14 +1,15 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const os = require('os');
 
-const dbPath = path.resolve('/tmp', 'school_supplies.sqlite');
+const dbPath = path.join(os.tmpdir(), 'school_supplies.sqlite');
 
 // Connect to the database
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         return console.error('Error opening database', err.message);
     }
-    console.log('Connected to the SQLite database.');
+    console.log(`Database created/opened at ${dbPath}`);
     createTables();
 });
 

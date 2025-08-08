@@ -2,19 +2,20 @@ const express = require('express');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const engine = require('ejs-mate');
+const os = require('os');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Database connection
-const dbPath = path.resolve('/tmp', 'school_supplies.sqlite');
+const dbPath = path.join(os.tmpdir(), 'school_supplies.sqlite');
 const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err) {
         console.error("Fatal error: Could not connect to the database.", err.message);
         process.exit(1); // Exit if we can't connect
     }
 
-    console.log('Successfully connected to the SQLite database.');
+    console.log(`Successfully connected to the SQLite database at ${dbPath}`);
 
     // --- All application logic now goes inside this callback ---
 
