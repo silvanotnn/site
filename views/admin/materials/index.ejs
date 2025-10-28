@@ -1,0 +1,38 @@
+<% layout('layouts/main') %>
+
+<div class="header-container">
+    <h2>Gerenciar Estoque de Materiais</h2>
+    <a href="/admin/materials/new" class="btn btn-primary">Adicionar Novo Material</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nome do Material</th>
+            <th>Descrição</th>
+            <th class="quantity">Quantidade em Estoque</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if(materials.length > 0) { %>
+            <% materials.forEach(material => { %>
+                <tr>
+                    <td><%= material.name %></td>
+                    <td><%= material.description %></td>
+                    <td class="quantity"><%= material.quantity %></td>
+                    <td class="actions">
+                        <a href="/admin/materials/<%= material.id %>/edit" class="btn btn-secondary">Editar</a>
+                        <form action="/admin/materials/<%= material.id %>/delete" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
+                            <button type="submit" class="btn btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        <% } else { %>
+            <tr>
+                <td colspan="4">Nenhum material encontrado.</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
